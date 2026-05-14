@@ -18,6 +18,9 @@ backend/.env
 dist/
 build/
 
+# Test folders
+/backend/src/scripts
+
 # Operating System files
 .DS_Store
 Thumbs.db
