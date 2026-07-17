@@ -6,7 +6,7 @@ import mainRouter from './routes/index.js';
 
 //inital setup
 const app = express();
-app.use('*', mainRouter);
+app.use('/', mainRouter);
 
 
 app.listen(process.env.SERVER_PORT, ()=>{
