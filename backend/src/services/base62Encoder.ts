@@ -1,9 +1,8 @@
+import { error } from "node:console";
+
 const BASE62_CHARS =
   "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-/**
- * Encodes a PostgreSQL BIGSERIAL ID into a Base62 string.
- */
 export function base62Encode(id: number | string | bigint): string {
   let num: bigint = BigInt(id);
 
@@ -24,12 +23,10 @@ export function base62Encode(id: number | string | bigint): string {
   return encoded;
 }
 
-/**
- * Decodes a Base62 string into a decimal string.
- * Returning a string safely preserves PostgreSQL BIGSERIAL precision.
- */
-export function base62Decode(str: string): string {
-  if (!str) return "0";
+export function base62Decode(str: string): bigint {
+  if (str.length === 0){
+    throw new Error(`String cannot be empty`);
+  }
 
   let num: bigint = 0n;
   const base: bigint = 62n;
@@ -45,5 +42,5 @@ export function base62Decode(str: string): string {
     num = num * base + BigInt(index);
   }
 
-  return num.toString();
+  return num;
 }
