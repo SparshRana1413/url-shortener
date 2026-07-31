@@ -6,7 +6,7 @@ export interface LoginInput {
   password: string;
 }
 
-export async function loginUser({ email, password }: LoginInput) {
+export async function LoginUser({ email, password }: LoginInput) {
 
     const result = await db.query(
     `SELECT id, username, email, password_hash, created_at 

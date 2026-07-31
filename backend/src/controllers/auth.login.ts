@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { loginUser } from "../services/auth.loginUser.js";
+import { LoginUser } from "../services/auth.login.js";
 import jwt from "jsonwebtoken";
 
 /**
@@ -51,7 +51,7 @@ export default async function login(req: Request, res: Response) {
     }
 
     // 3. AUTHENTICATION SERVICE CALL
-    const user = await loginUser({ email: normalizedEmail, password });
+    const user = await LoginUser({ email: normalizedEmail, password });
 
     // 4. ENV SECRET CHECK
     const secret = process.env.JWT_SIGNATURE;

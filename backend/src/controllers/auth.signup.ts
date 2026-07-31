@@ -1,6 +1,6 @@
 // src/controllers/auth.signup.ts
 import type { Request, Response } from 'express';
-import { createUser } from '../services/auth.createUser.js';
+import { RegisterUser } from '../services/auth.register.js';
 
 export default async function signup(req: Request, res: Response) {
   try {
@@ -13,7 +13,7 @@ export default async function signup(req: Request, res: Response) {
     }
 
     // 3. Delegate business logic & DB creation to the service layer
-    const newUser = await createUser({ username, email, password });
+    const newUser = await RegisterUser({ username, email, password });
 
     // 4. Return success
     return res.status(201).json({

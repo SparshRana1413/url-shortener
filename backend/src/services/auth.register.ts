@@ -8,7 +8,7 @@ export interface CreateUserInput {
   password: string;
 }
 
-export async function createUser({ username, email, password }: CreateUserInput) {
+export async function RegisterUser({ username, email, password }: CreateUserInput) {
   
   // hashing the password
   const saltRounds = 10;
