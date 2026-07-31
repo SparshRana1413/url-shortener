@@ -1,8 +1,8 @@
 import { Router } from "express";
+import shortenUrl from "../controllers/url.createShortURL.js";
 
 const router = Router();
-// all url related routes go here
 
-// router.post('/create', );
+router.post('/create', shortenUrl);
 
 export default router;

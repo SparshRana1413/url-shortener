@@ -9,11 +9,11 @@ export interface AuthenticatedRequest extends Request {
   user?: JwtPayload | string;
 }
 
-export const requireAuthAPI = (
+export default function requireAuthAPI(
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): void => {
+): void {
   try {
     // 1. EXTRACT TOKEN: Try reading from HTTP-only cookie first, fallback to Bearer header
     let token = req.cookies?.token;

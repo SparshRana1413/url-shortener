@@ -1,5 +1,3 @@
-import { error } from "node:console";
-
 const BASE62_CHARS =
   "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
