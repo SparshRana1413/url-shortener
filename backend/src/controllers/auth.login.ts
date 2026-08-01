@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { LoginUser } from "../services/auth.login.js";
 import jwt from "jsonwebtoken";
 
@@ -10,7 +10,7 @@ function isValidEmail(email: string): boolean {
   return emailRegex.test(email);
 }
 
-export default async function login(req: Request, res: Response) {
+export default async function login(req: Request, res: Response, next: NextFunction) {
   try {
     const { email, password } = req.body;
 
@@ -107,11 +107,6 @@ export default async function login(req: Request, res: Response) {
       });
     }
 
-    console.error("Login Internal Error:", error);
-    return res.status(500).json({
-      success: false,
-      error: "Internal Server Error",
-      message: "Something went wrong on our end. Please try again later.",
-    });
+    return next(error);
   }
 }

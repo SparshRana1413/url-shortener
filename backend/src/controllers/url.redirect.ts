@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 
 import redisClient from "../config/redis.js";
 import pool from "../config/db.js";
@@ -13,7 +13,8 @@ interface UrlRecord {
 
 export default async function redirect(
     req: Request<RedirectParams>,
-    res: Response
+    res: Response,
+    next: NextFunction
 ) {
     try {
         // Get shortcode from URL parameters
@@ -62,11 +63,6 @@ export default async function redirect(
         return res.redirect(302, originalUrl);
 
     } catch (error) {
-        console.error("Error redirecting URL:", error);
-
-        return res.status(500).json({
-            success: false,
-            error: "Internal server error",
-        });
+        return next(error);
     }
 }

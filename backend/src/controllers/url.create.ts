@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 
 import pool from "../config/db.js";
 import redisClient from "../config/redis.js";
@@ -6,7 +6,7 @@ import redisClient from "../config/redis.js";
 import { validateUrl } from "../utils/urlValidator.js";
 import { base62Encode } from "../utils/base62Encoder.js";
 
-export default async function shortenUrl(req: Request, res: Response) {
+export default async function shortenUrl(req: Request, res: Response, next: NextFunction) {
   try {
     // Get raw URL from request body
     const { url } = req.body;
@@ -79,11 +79,6 @@ export default async function shortenUrl(req: Request, res: Response) {
       },
     });
   } catch (error) {
-    console.error("Error shortening URL:", error);
-
-    return res.status(500).json({
-      success: false,
-      error: "Internal server error",
-    });
+    return next(error);
   }
 }

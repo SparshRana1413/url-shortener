@@ -1,8 +1,8 @@
 // src/controllers/auth.signup.ts
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import { RegisterUser } from '../services/auth.register.js';
 
-export default async function signup(req: Request, res: Response) {
+export default async function signup(req: Request, res: Response, next: NextFunction) {
   try {
     // 1. Extract req.body
     const { username, email, password } = req.body;
@@ -31,7 +31,6 @@ export default async function signup(req: Request, res: Response) {
     }
 
     // Handle unexpected failures
-    console.error('Signup Error:', error);
-    return res.status(500).json({ error: 'Internal server error.' });
+    return next(error);
   }
 }

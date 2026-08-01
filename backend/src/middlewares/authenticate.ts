@@ -68,10 +68,6 @@ export default function requireAuthAPI(
     }
 
     // Server/Configuration errors
-    console.error('Middleware Verification Error:', error);
-    res.status(500).json({ 
-      success: false,
-      message: 'Internal server error during authentication.' 
-    });
+    return next(error);
   }
 };
