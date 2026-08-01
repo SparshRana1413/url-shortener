@@ -1,7 +1,7 @@
 import { Router } from "express"; 
-import redirect from "../controllers/url.redirect.js"; // (or wherever your handler is)
+import redirect from "../controllers/url.redirect.js";
 
-const router = Router(); // 👈 YOU ARE MISSING THIS INSTANTIATION!
+const router = Router();
 
 router.get("/", redirect);
 
