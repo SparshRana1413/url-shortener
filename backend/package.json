@@ -26,6 +26,7 @@
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.22.0",
     "redis": "^6.1.0",
+    "tldts": "^7.4.10",
     "ua-parser-js": "^2.0.10"
   },
   "devDependencies": {

@@ -22,7 +22,7 @@ api.interceptors.request.use(
   }
 );
 
-// 2. Response Interceptor: Handle 401 Unauthorized (MISSING IN YOUR CODE)
+// 2. Response Interceptor: Handle Token doesn't exist
 api.interceptors.response.use(
   (response) => response,
   (error) => {

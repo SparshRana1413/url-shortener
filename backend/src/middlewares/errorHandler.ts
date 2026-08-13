@@ -24,6 +24,7 @@ const errorHandler: ErrorRequestHandler = (err, req: Request, res: Response, nex
         })
     }
 
+    
     // fallback for any other errors
     console.error(err);
     return res.status(500).json({

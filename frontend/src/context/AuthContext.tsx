@@ -1,16 +1,5 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  type ReactNode,
-} from "react";
-import {
-  login as apiLogin,
-  register as apiRegister,
-  type LoginParams,
-  type RegisterParams,
-} from "../api/auth";
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import { login as apiLogin, register as apiRegister, type LoginParams, type RegisterParams } from "../api/auth";
 
 export interface User {
   id: string;

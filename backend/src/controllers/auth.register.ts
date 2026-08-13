@@ -12,7 +12,7 @@ export default async function signup(req: Request, res: Response, next: NextFunc
       return res.status(400).json({ error: 'All fields are required.' });
     }
 
-    if(password.length() <= 7){
+    if(password.length <= 7){
       return res.status(400).json({error: 'Password must be at least 8 characters long'});
     }
 
