@@ -22,7 +22,7 @@ export default async function redirect(
 
         // Check Redis first
         // GET returns null if the shortcode does not exist
-        const cachedUrl = await redisClient.get(shortcode);
+        const cachedUrl = await redisClient.get(`url:${shortcode}`);
 
         // Cache hit: redirect immediately without querying PostgreSQL
         if (cachedUrl) {
