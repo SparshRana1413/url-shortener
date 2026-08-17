@@ -11,6 +11,7 @@ interface RedirectParams {
 interface UrlRecord {
     id: number;
     long_url: string;
+    expires_at: string | null;
 }
 
 export default async function redirect(
@@ -19,7 +20,6 @@ export default async function redirect(
     next: NextFunction
 ) {
     try {
-        // Get shortcode from URL parameters
         const shortcode = req.params.shortcode;
 
         // Check Redis first
@@ -27,30 +27,52 @@ export default async function redirect(
 
         // Cache hit
         if (cachedUrl) {
+            // console.log("redis cache hit \n", cachedUrl);
             const urlRecord: UrlRecord = JSON.parse(cachedUrl);
 
-            // Increment total click count asynchronously
+            // Safety check for expiration
+            if (
+                urlRecord.expires_at &&
+                new Date(urlRecord.expires_at) <= new Date()
+            ) {
+                await redisClient.del(`url:${shortcode}`);
+
+                return res.status(404).json({
+                    success: false,
+                    error: "Short URL has expired",
+                });
+            }
+
+            // Increment click count
             void pool.query(
                 `
-                    UPDATE urls
-                    SET click_count = click_count + 1
-                    WHERE id = $1
+                UPDATE urls
+                SET click_count = click_count + 1
+                WHERE id = $1
                 `,
                 [urlRecord.id]
             );
 
-            // Log detailed analytics asynchronously
+            // Log detailed analytics
             void logclick(req.headers, urlRecord.id);
 
-            // Redirect immediately
             return res.redirect(302, urlRecord.long_url);
         }
+        // console.log("redis cache miss", shortcode);
 
-        // Cache miss: look for the shortcode in PostgreSQL
+        // Cache miss: query PostgreSQL
         const queryText = `
-            SELECT id, long_url
+            SELECT
+                id,
+                long_url,
+                expires_at
             FROM urls
             WHERE short_code = $1
+              AND is_active = TRUE
+              AND (
+                  expires_at IS NULL
+                  OR expires_at > CURRENT_TIMESTAMP
+              )
             LIMIT 1
         `;
 
@@ -59,9 +81,9 @@ export default async function redirect(
             [shortcode]
         );
 
-        // Shortcode doesn't exist
         const urlRecord = result.rows[0];
 
+        // URL doesn't exist, is inactive, or has expired
         if (!urlRecord || !urlRecord.long_url) {
             return res.status(404).json({
                 success: false,
@@ -69,33 +91,50 @@ export default async function redirect(
             });
         }
 
-        const originalUrl = urlRecord.long_url;
+        // Store URL information in Redis
+        const cacheData: UrlRecord = {
+            id: urlRecord.id,
+            long_url: urlRecord.long_url,
+            expires_at: urlRecord.expires_at,
+        };
 
-        // Repopulate Redis after a cache miss
-        // Store both the database ID and destination URL
-        await redisClient.set(
-            `url:${shortcode}`,
-            JSON.stringify({
-                id: urlRecord.id,
-                long_url: originalUrl,
-            })
-        );
+        if (urlRecord.expires_at) {
+            const expiresAt = new Date(urlRecord.expires_at);
+            const ttlSeconds = Math.ceil(
+                (expiresAt.getTime() - Date.now()) / 1000
+            );
 
-        // Increment total click count asynchronously
+            if (ttlSeconds > 0) {
+                await redisClient.set(
+                    `url:${shortcode}`,
+                    JSON.stringify(cacheData),
+                    {
+                        EX: ttlSeconds,
+                    }
+                );
+            }
+        } else {
+            // No expiration → normal cache entry
+            await redisClient.set(
+                `url:${shortcode}`,
+                JSON.stringify(cacheData)
+            );
+        }
+
+        // Increment click count
         void pool.query(
             `
-                UPDATE urls
-                SET click_count = click_count + 1
-                WHERE id = $1
+            UPDATE urls
+            SET click_count = click_count + 1
+            WHERE id = $1
             `,
             [urlRecord.id]
         );
 
-        // Log detailed analytics asynchronously
+        // Log detailed analytics
         void logclick(req.headers, urlRecord.id);
 
-        // Redirect visitor to the original URL
-        return res.redirect(302, originalUrl);
+        return res.redirect(302, urlRecord.long_url);
 
     } catch (error) {
         return next(error);
