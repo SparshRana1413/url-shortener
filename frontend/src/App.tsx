@@ -7,8 +7,6 @@ function App() {
   return (
     <>
       <section id="center">
-        <div className="hero">
-        </div>
         <div>
           <h1 className='text-blue-500'>Get started</h1>
           <p className='text-blue-500'>
