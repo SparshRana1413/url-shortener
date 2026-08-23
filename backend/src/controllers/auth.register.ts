@@ -5,6 +5,7 @@ import {
     validateUsername,
     validatePassword
 } from "../services/auth.validate.js";
+import jwt from "jsonwebtoken";
 
 export default async function signup(
     req: Request,
@@ -57,8 +58,20 @@ export default async function signup(
             password
         });
 
+        const secret = process.env.JWT_SIGNATURE;
+        if (!secret) {
+            throw new Error("JWT_SECRET is not defined in environment variables.");
+        }
+
+        const token = jwt.sign(
+            { sub: newUser.id, email: newUser.email },
+            secret,
+            { expiresIn: "1h" }
+        );
+
         return res.status(201).json({
             message: "User created successfully",
+            token,
             user: newUser
         });
 

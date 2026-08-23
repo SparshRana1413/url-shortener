@@ -6,6 +6,7 @@ export interface LoginParams {
 }
 
 export interface RegisterParams {
+  username: string;
   email: string;
   password: string;
 }
@@ -20,7 +21,7 @@ export interface AuthResponse {
 }
 
 export async function register(credentials: RegisterParams): Promise<AuthResponse> {
-  const response = await client.post<AuthResponse>("/auth/signup", credentials);
+  const response = await client.post<AuthResponse>("/auth/register", credentials);
   return response.data;
 }
 

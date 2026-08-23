@@ -87,6 +87,7 @@ export default async function login(req: Request, res: Response, next: NextFunct
     return res.status(200).json({
       success: true,
       message: "Login successful",
+      token,
       user: user,
     });
   } catch (error: any) {

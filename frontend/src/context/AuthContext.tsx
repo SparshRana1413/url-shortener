@@ -8,7 +8,7 @@ interface AuthContextValue {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  register: (email: string, password: string) => Promise<void>;
+  register: (username: string, email: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -51,8 +51,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
         localStorage.clear();
         setUser(null);
       },
-      register: async (email, password) => {
-        const response = await registerRequest({ email, password });
+      register: async (username, email, password) => {
+        const response = await registerRequest({ username, email, password });
         persistAuth(response);
         setUser(response.user);
       },
