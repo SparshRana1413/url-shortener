@@ -25,10 +25,22 @@ export default async function redirect(
         // Check Redis first
         const cachedUrl = await redisClient.get(`url:${shortcode}`);
 
-        // Cache hit
+        let cachedRecord: UrlRecord | null = null;
+
         if (cachedUrl) {
-            // console.log("redis cache hit \n", cachedUrl);
-            const urlRecord: UrlRecord = JSON.parse(cachedUrl);
+            try {
+                cachedRecord = JSON.parse(cachedUrl) as UrlRecord;
+            } catch {
+                // Entries written before the cache format was standardized only
+                // contain the destination URL. Remove them and fetch the full
+                // record from PostgreSQL below.
+                await redisClient.del(`url:${shortcode}`);
+            }
+        }
+
+        // Cache hit
+        if (cachedRecord) {
+            const urlRecord = cachedRecord;
 
             // Safety check for expiration
             if (

@@ -78,12 +78,22 @@ export default async function shortenUrl(
       throw new Error("Failed to create URL");
     }
 
-    // Cache the generated short code
-    await redisClient.set(`url:${shortCode}`, originalUrl);
+    // Keep create-side cache entries compatible with the redirect cache reader.
+    // It needs the database ID for click logging and the expiry value for its
+    // safety check, not just the destination URL.
+    await redisClient.set(
+      `url:${shortCode}`,
+      JSON.stringify({
+        id: urlRow.id,
+        long_url: originalUrl,
+        expires_at: null,
+      }),
+    );
 
     // URL successfully shortened
-    const appDomain = process.env.APP_DOMAIN ?? `localhost:${process.env.SERVER_PORT ?? 3000}`;
-    const appBaseUrl = appDomain.startsWith("http") ? appDomain : `http://${appDomain}`;
+    // Development-only short-link base URL. A public domain will be configured
+    // when the application is deployed.
+    const appBaseUrl = "http://localhost:3000";
 
     return res.status(201).json({
       success: true,
