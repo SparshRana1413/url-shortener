@@ -15,11 +15,12 @@ export default async function shortenUrl(
     // Get raw URL from request body
     const { url } = req.body;
 
-    // Make sure a URL was actually provided
-    if (!url || typeof url !== "string") {
+    // Keep non-string input out of the URL validator. Empty strings are
+    // intentionally validated below so its user-facing error is returned.
+    if (typeof url !== "string") {
       return res.status(400).json({
         success: false,
-        error: "URL is required",
+        error: "URL can't be empty",
       });
     }
 
@@ -81,10 +82,14 @@ export default async function shortenUrl(
     await redisClient.set(`url:${shortCode}`, originalUrl);
 
     // URL successfully shortened
+    const appDomain = process.env.APP_DOMAIN ?? `localhost:${process.env.SERVER_PORT ?? 3000}`;
+    const appBaseUrl = appDomain.startsWith("http") ? appDomain : `http://${appDomain}`;
+
     return res.status(201).json({
       success: true,
       data: {
         shortCode,
+        shortUrl: `${appBaseUrl}/${shortCode}`,
         originalUrl,
         createdAt: urlRow.created_at,
       },
