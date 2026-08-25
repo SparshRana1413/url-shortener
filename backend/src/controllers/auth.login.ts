@@ -79,7 +79,8 @@ export default async function login(req: Request, res: Response, next: NextFunct
     res.cookie("token", token, {
       httpOnly: true, // Prevents client-side JS from accessing the cookie (XSS protection)
       secure: isProduction, // Uses HTTPS in production, allows HTTP in local development
-      sameSite: isProduction ? "lax" : "none", // Allows cross-origin cookies in dev if needed
+      // sameSite: isProduction ? "lax" : "none", // Allows cross-origin cookies in dev if needed
+      sameSite: "lax",
       maxAge: 3600000, // 1 hour in milliseconds
     });
 

@@ -10,6 +10,24 @@ export interface ShortenResponse {
     };
 }
 
+export interface Url {
+    id: number;
+    shortCode: string;
+    shortUrl: string;
+    originalUrl: string;
+    clickCount: number;
+    createdAt: string;
+}
+
+export interface GetUrlsResponse {
+    success: boolean;
+    data: {
+        urls: Url[];
+        page: number;
+        totalPages: number;
+    };
+}
+
 export async function shorten({
     url,
     customAlias,
@@ -28,8 +46,10 @@ export async function shorten({
     return response.data;
 }
 
-export async function getUrls(page: number = 1) {
-    const response = await api.get("/url", {
+export async function getUrls(
+    page: number = 1
+): Promise<GetUrlsResponse> {
+    const response = await api.get<GetUrlsResponse>("/url", {
         params: {
             page,
         },

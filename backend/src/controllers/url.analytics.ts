@@ -6,12 +6,12 @@ type AnalyticsQuery = {
 };
 
 export default async function analytics(
-    req: Request<{ shortCode: string }, {}, {}, AnalyticsQuery>,
+    req: Request<{ shortcode: string }, {}, {}, AnalyticsQuery>,
     res: Response,
     next: NextFunction
 ) {
     try {
-        const { shortCode } = req.params;
+        const { shortcode } = req.params;
         const range = req.query.range ?? "7d";
 
         if (!["1d", "7d", "30d", "90d"].includes(range)) {
@@ -21,10 +21,10 @@ export default async function analytics(
             });
         }
 
-        const userId = req.user.id;
+        const userId = req.user.sub;
 
         const data = await GetUrlAnalytics(
-            shortCode,
+            shortcode,
             userId,
             range as "1d" | "7d" | "30d" | "90d"
         );
