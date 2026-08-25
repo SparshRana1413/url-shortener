@@ -9,6 +9,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import * as urlsApi from "../../api/urls";
+import { useState } from "react";
+
+type AnalyticsRange = "7d" | "30d" | "90d";
 
 type AnalyticsModalProps = {
   shortCode: string;
@@ -19,9 +22,13 @@ export default function AnalyticsModal({
   shortCode,
   onClose,
 }: AnalyticsModalProps) {
+  const [range, setRange] = useState<AnalyticsRange>("7d");
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["analytics", shortCode, "7d"],
-    queryFn: () => urlsApi.getAnalytics(shortCode, "7d"),
+    queryKey: ["analytics", shortCode, range],
+    queryFn: () => urlsApi.getAnalytics(shortCode, range),
+    staleTime: 5 * 60 * 1000,
+    refetchOnMount: "always",
   });
 
   const analytics = data?.data;
@@ -48,6 +55,23 @@ export default function AnalyticsModal({
           >
             ✕
           </button>
+        </div>
+
+        <div className="mb-6 flex gap-2">
+          {(["7d", "30d", "90d"] as AnalyticsRange[]).map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => setRange(option)}
+              className={`rounded-md px-4 py-2 text-sm font-medium transition ${
+                range === option
+                  ? "bg-blue-600 text-white"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              }`}
+            >
+              {option}
+            </button>
+          ))}
         </div>
 
         {isLoading && (
